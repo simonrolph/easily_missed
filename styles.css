@@ -1,0 +1,25 @@
+body{
+    background-color: #fffaf2;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.container {
+    padding-top: 50px;
+}
+
+#map {
+    margin-top: 15px;
+}
+
+.card-body {
+    padding: 5px;
+}
+
+.card{
+    margin:2px;
+}
+
+h1{
+    font-family: 'Caveat', cursive;
+    font-size: 70px;
+}
