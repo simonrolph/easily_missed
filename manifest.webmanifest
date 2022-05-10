@@ -1,0 +1,30 @@
+{
+    // Name of the app and short name in case there isn't enough space
+    "name": "Easily Missed",
+    "short_name": "EM",
+    // Description what your app is
+    "description": "Missing local records of regionally common species",
+  
+    // Scope and start URL - these need to change to yours
+    "scope": "/easily_missed/",
+    "start_url": "/easily_missed/",
+  
+    // colours of the app as displayed in the installer
+    "background_color": "#FFFAF2",
+    "theme_color": "#3388FF",
+  
+    // Display of the app. 
+    //This could be "standalone", "fullscreen", "minimal-ui" or "browser"
+    "display": "standalone", 
+    
+    // The possible icons to display. Make sure to change the src URL,
+    // the type and the size to your needs. If the size isn't correct, 
+    // you may not be able to install the app. 
+    "icons": [
+        {
+          "src": "/easily_missed/image.png",
+          "type": "image/png",
+          "sizes": "327x265"
+        }
+    ]
+  }
