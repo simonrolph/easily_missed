@@ -1,92 +1,106 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
-        crossorigin=""/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin="" />
 
-    <link rel="stylesheet" type="text/css" href="styles.css"  />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500&family=Open+Sans:wght@400&display=swap" rel="stylesheet">
 
-    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
-        integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
         crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/gh/Falke-Design/L.Donut@latest/src/L.Donut.js"></script>
 
     <title>Easily missed</title>
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
-  </head>
-  <body>
+</head>
+
+<body>
 
     <div class="container">
+        <p style="text-align-last: right"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20Easily%20missed,%20an%20app%20to%20help%20recorders%20identify%20local%20gaps%20in%20species%20records">Tweet</a></p>
         <h1>"Easily missed"</h1>
         <h3>Missing local records of regionally common species</h3>
-        <p>A tool to help recorders identify local gaps in species records.</p>
+        <p>A tool to help recorders identify local gaps in <a href="https://www.inaturalist.org/" target="_blank">iNaturalist</a> species records. The tool builds a list of species that have been recorded within 5km of where you are. The tool determines which of these species haven't been recorded within 1km of where you are to help you prioritise which species are most important to record to fill data gaps. <a href="#species_lists">Skip to species lists.</a></p>
+
+        <!-- map -->
         <div id="map" style="height: 420px;"></div>
         <p style="text-align: right"><a id="link_to_inat" target="_blank">Explore area on iNaturalist</a></p>
         <br>
 
-
-        <!-- headline numbers -->  
+        <!-- headline numbers -->
         <div class="row" style="text-align: center;">
             <div class="col-sm">
-              <h3 class="sp_count_1" >-</h3>
-              <p>Species recorded in the region</p> 
+                <h3 class="sp_count_1">-</h3>
+                <p>Species recorded within 1km</p>
             </div>
             <div class="col-sm">
                 <h3 class="sp_count_2">-</h3>
-                <p>Species recorded in the locality</p> 
+                <p>Species recorded within 5km</p>
             </div>
             <div class="col-sm">
-              <h3 class="ratio">-</h3>
-              <p>Doughnut score</p>
+                <h3 class="ratio">-</h3>
+                <p>Doughnut score</p>
             </div>
-          </div>
-
-          <br>
-          
-
-          <ul class="nav nav-tabs" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true"><h6>Missing species</h6></button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false"><h6>Recorded species</h6></button>
-                </li>
-              </ul>
-              <div class="tab-content" id="myTabContent">
-                <div class="tab-pane fade show active species_list" id="home" role="tabpanel" aria-labelledby="home-tab">
-                    <p>Loading species list...</p>
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden"></span>
-                    </div>
-
-
-                </div>
-                <div class="tab-pane fade species_list_recorded" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                    <p>Loading species list...</p>
-                    <div class="spinner-border" role="status">
-                        <span class="visually-hidden"></span>
-                    </div>
-                </div>
-              </div>
+        </div>
 
         <br>
 
-        <p style="text-align: center">A web thingy by <a href="https://twitter.com/simon_rolph">Simon Rolph</a>. Find the code on <a href="https://github.com/simonrolph">GitHub.</a></p>
+        <ul class="nav nav-tabs" id="species_lists" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home"
+                    aria-selected="true"><h6>Missing species</h6></button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
+                    aria-selected="false"><h6>Recorded species</h6></button>
+            </li>
+        </ul>
+        <div class="tab-content" id="species_list2">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <p>These are species which have <b>not</b> been recorded within 1km of where you are, but have been recorded within
+                    5km.</p>
+                <div class="species_list">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <p>These are species which have been recorded within 1km of where you are.</p>
+                <div class="species_list_recorded">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <br>
+
+        <p style="text-align: center">A web thingy by <a href="https://twitter.com/simon_rolph">Simon Rolph</a>. Find the
+            code on <a href="https://github.com/simonrolph/easily_missed">GitHub.</a></p>
 
     </div>
 
-    
+
 
     <script>
         if (navigator.geolocation) {
@@ -106,7 +120,7 @@
         }
 
         // initial load
-        function getPosition(position){
+        function getPosition(position) {
             // get location
             let lat = position.coords.latitude;
             let lng = position.coords.longitude;
@@ -115,13 +129,15 @@
             let l_rad = 1;
             let b_rad = 5;
 
+            let user_id = "simonrolph";
+
             // update the link to inat explore
             var a = document.getElementById('link_to_inat');
-            a.href = 'https://www.inaturalist.org/observations?place_id=any&subview=map&lat='+lat+'&lng='+lng+'&radius='+b_rad
+            a.href = 'https://www.inaturalist.org/observations?place_id=any&subview=map&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad
 
 
             // make the mini map
-            let map = L.map('map').setView([lat, lng], 14);
+            let map = L.map('map').setView([lat, lng], 12);
 
             map.options.maxZoom = 16;
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -130,39 +146,49 @@
             }).addTo(map);
 
             // add the donut
-            let donut = L.donut([lat, lng],{
+            let donut = L.donut([lat, lng], {
                 radius: b_rad * 1000,
                 innerRadius: l_rad * 1000,
                 innerRadiusAsPercent: false,
             }).addTo(map);
 
-            
+
             async function renderData() {
                 // get the number of records for the region and the locality
-                let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat='+lat+'&lng='+lng+'&radius='+b_rad+"&per_page=0");
-                let species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat='+lat+'&lng='+lng+'&radius='+l_rad+"&per_page=0");
+                let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad + "&per_page=0");
+                let species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + l_rad + "&per_page=0");
+
+                let today = new Date();
+                let priorDate = new Date(new Date().setDate(today.getDate() - 30));
+                let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad + "&per_page=0" + "&d2=" + priorDate);
+                let species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + l_rad + "&per_page=0" + "&d2=" + priorDate);
+
+                console.log(species_count_old);
 
                 // update the headline figures for species counts
                 let sp_count_1 = document.querySelector('.sp_count_1');
-                sp_count_1.innerHTML = species_count.total_results;
+                sp_count_1.innerHTML = species_count_local.total_results + "<small> (+" + (species_count_local.total_results - species_count_local_old.total_results) + ")</small>";
                 let sp_count_2 = document.querySelector('.sp_count_2');
-                sp_count_2.innerHTML = species_count_local.total_results;
+                sp_count_2.innerHTML = species_count.total_results + "<small> (+" + (species_count.total_results - species_count_old.total_results) + ")</small>";
                 let ratio = document.querySelector('.ratio');
-                ratio.innerHTML = (100*(species_count_local.total_results/species_count.total_results)).toFixed(2);
+                let ratio_value = (100 * ((species_count_local.total_results / species_count.total_results) - (species_count_local_old.total_results / species_count_old.total_results))).toFixed(2);
+                if (ratio_value > 0) { ratio_value = "+" + ratio_value };
+                ratio.innerHTML = (100 * (species_count_local.total_results / species_count.total_results)).toFixed(2) + "%" +
+                    "<small> (" + ratio_value + ")</small>";
 
                 // initialise create an array of species in the area
                 species_local_array = [];
 
                 // how many pages of results do I have to go through?
-                let max_page = Math.floor(species_count_local.total_results / 500) +1
+                let max_page = Math.floor(species_count_local.total_results / 500) + 1
                 console.log(max_page)
 
                 // add to the array of species in the area
                 let html_recorded = '';
-                for (let i = 1; i < (max_page+1); i++) {
-                    let species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat='+lat+'&lng='+lng+'&radius='+l_rad+'&page='+i);
+                for (let i = 1; i < (max_page + 1); i++) {
+                    let species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + l_rad + '&page=' + i);
                     console.log(species_local);
-                    species_local.results.forEach(specie => {            
+                    species_local.results.forEach(specie => {
                         species_local_array.push(specie.taxon.name);
 
                         var record_plurality = "record";
@@ -171,41 +197,41 @@
                             var record_plurality = "records";
                         }
 
-                        let htmlSegment = '<div class="card"><div class="card-body">'+
-                            "<em>"+specie.taxon.name+"</em>, " +specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
-                            +lat+'&lng='+lng+'&radius='+b_rad+'&taxon_id='+specie.taxon.id +
-                            ">" + 
-                            specie.count+ " "+ record_plurality+ "</a>"+
+                        let htmlSegment = '<div class="card"><div class="card-body">' +
+                            "<em>" + specie.taxon.name + "</em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
+                            +lat + '&lng=' + lng + '&radius=' + b_rad + '&taxon_id=' + specie.taxon.id +
+                            ">" +
+                            specie.count + " " + record_plurality + "</a>" +
                             '</div></div>';
-                
+
                         html_recorded += htmlSegment;
                     });
 
                     let container = document.querySelector('.species_list_recorded');
                     container.innerHTML = html_recorded;
-                    
+
                 }
 
                 console.log(species_local_array);
 
-                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat='+lat+'&lng='+lng+'&radius='+b_rad);
+                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad);
                 console.log(species);
 
                 let html_missing = '';
                 species.results.forEach(specie => {
-                    if (!(species_local_array.includes(specie.taxon.name))){
+                    if (!(species_local_array.includes(specie.taxon.name))) {
                         var record_plurality = "record";
                         if (specie.count > 1) {
                             var record_plurality = "records";
                         }
 
-                        let htmlSegment = '<div class="card"><div class="card-body">'+
-                            "<em>"+specie.taxon.name+"</em>, " +specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
-                            +lat+'&lng='+lng+'&radius='+b_rad+'&taxon_id='+specie.taxon.id +
-                            ">" + 
-                            specie.count+ " "+ record_plurality+ "</a>"+
+                        let htmlSegment = '<div class="card"><div class="card-body">' +
+                            "<em>" + specie.taxon.name + "</em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
+                            +lat + '&lng=' + lng + '&radius=' + b_rad + '&taxon_id=' + specie.taxon.id +
+                            ">" +
+                            specie.count + " " + record_plurality + "</a>" +
                             '</div></div>';
-                
+
                         html_missing += htmlSegment;
                     }
                 });
@@ -216,17 +242,47 @@
 
             renderData();
 
-            L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=blue&lat='+lat+'&lng='+lng+'&radius='+b_rad, {
+            // add all records onto map
+            L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=blue&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad, {
                 maxZoom: 19,
                 opacity: 0.3,
                 attribution: 'iNaturalist'
             }).addTo(map);
+
+            // add user records onto map
+            //L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=green&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad + "&user_id=" + user_id, {
+            //   maxZoom: 19,
+            //    opacity: 0.3,
+            //    attribution: 'iNaturalist'
+            //}).addTo(map);
         }
 
-    
+
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
-  </body>
+    <script>
+        // twitter button
+        window.twttr = (function (d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0],
+                t = window.twttr || {};
+            if (d.getElementById(id)) return t;
+            js = d.createElement(s);
+            js.id = id;
+            js.src = "https://platform.twitter.com/widgets.js";
+            fjs.parentNode.insertBefore(js, fjs);
+
+            t._e = [];
+            t.ready = function (f) {
+                t._e.push(f);
+            };
+
+            return t;
+        }(document, "script", "twitter-wjs"));</script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+
+</body>
+
 </html>
