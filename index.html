@@ -33,8 +33,8 @@
     <div class="container">
         <p style="text-align-last: right"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20Easily%20Missed,%20an%20app%20to%20help%20recorders%20identify%20local%20gaps%20in%20species%20records">Tweet</a></p>
         <h1>"Easily missed"</h1>
-        <h3>Missing local records of regionally common species</h3>
-        <p>A tool to help recorders identify local gaps in <a href="https://www.inaturalist.org/" target="_blank">iNaturalist</a> species records. The tool builds a list of the top 500 species that have been recorded within 5km of where you are. The tool determines which of these species haven't been recorded within 1km of where you are to help you prioritise species that are most important to record to fill data gaps. It also compares to species lists as they were 30 days ago to give an indication of recent change. </p>
+        <h3>Build a more complete picture of the wildlife in your local area</h3>
+        <p>"Easily Missed" is a tool to help <a href="https://www.inaturalist.org/" target="_blank">iNaturalist</a> recorders identify local gaps in species records. The tool builds a list of species that have been recorded in your region (within 5km of where you are). The tool then helps you prioritise species to fill data gaps by determining which of these species haven't been recorded in your local area (within 1km). By filling local data gaps you'll boost your area's "doughnut score"; the percentage of species recorded locally compared to the wider region. The +/- numbers indicate change over the past 30 days.</p>
         <p><a href="#species_lists">Skip to species lists</a></p>
 
         <!-- map -->
@@ -76,8 +76,8 @@
         </ul>
         <div class="tab-content" id="species_list2">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <p>These are species which have <b>not</b> been recorded within 1km of where you are, but have been recorded within
-                    5km.</p>
+                <p>Species (and number of records) which have <b>not</b> been within 1km of where you are, but have been recorded within
+                    5km. Record these species to fill local data gaps.</p>
                 <div class="species_list">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -88,7 +88,7 @@
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <p>These are species which have been recorded within 1km of where you are.</p>
+                <p>Species (and number of records) which have been recorded within 1km of where you are.</p>
                 <div class="species_list_recorded">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -99,7 +99,7 @@
             </div>
 
             <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="profile-tab">
-                <p>Contributors who have recorded species within 1km of where you are.</p>
+                <p>Local contributors who have recorded species within 1km of where you are, and the percentage of the local area's species they recorded.</p>
                 <div class="people_list">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -155,7 +155,7 @@
 
 
             // make the mini map
-            let map = L.map('map').setView([lat, lng], 12);
+            let map = L.map('map').setView([lat, lng], 13);
 
             map.options.maxZoom = 16;
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -169,6 +169,14 @@
                 innerRadius: l_rad * 1000,
                 innerRadiusAsPercent: false,
             }).addTo(map);
+
+            // add the marker
+            var myIcon = L.icon({
+                iconUrl: 'images/location-pin.png',
+                iconSize: [24, 24],
+                iconAnchor: [12, 24],
+            });
+            L.marker([lat, lng], {icon: myIcon}).addTo(map);
 
 
             async function renderData() {
