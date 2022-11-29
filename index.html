@@ -69,6 +69,10 @@
                 <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile"
                     aria-selected="false"><h6>Recorded species</h6></button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="people-tab" data-bs-toggle="tab" data-bs-target="#people" type="button" role="tab" aria-controls="people"
+                    aria-selected="false"><h6>Contributors</h6></button>
+            </li>
         </ul>
         <div class="tab-content" id="species_list2">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -81,9 +85,8 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
+
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <p>These are species which have been recorded within 1km of where you are.</p>
                 <div class="species_list_recorded">
@@ -94,6 +97,18 @@
                     </div>
                 </div>
             </div>
+
+            <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="profile-tab">
+                <p>Contributors who have recorded species within 1km of where you are.</p>
+                <div class="people_list">
+                    <div class="d-flex justify-content-center">
+                        <div class="spinner-border" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <br>
@@ -165,8 +180,13 @@
                 let priorDate = new Date(new Date().setDate(today.getDate() - 30));
                 let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad + "&per_page=0" + "&d2=" + priorDate);
                 let species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + l_rad + "&per_page=0" + "&d2=" + priorDate);
-
                 console.log(species_count_old);
+
+                // Get the contributors
+                let contributors = await getData('https://api.inaturalist.org/v1/observations/observers?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + l_rad);
+                console.log(contributors); 
+
+                
 
                 // update the headline figures for species counts
                 let sp_count_1 = document.querySelector('.sp_count_1');
@@ -178,6 +198,32 @@
                 if (ratio_value > 0) { ratio_value = "+" + ratio_value };
                 ratio.innerHTML = (100 * (species_count_local.total_results / species_count.total_results)).toFixed(2) + "%" +
                     "<small> (" + ratio_value + ")</small>";
+
+
+                // Contributor tabs
+                let html_people_list = '';
+                contributors.results.forEach(contributor => {
+
+
+                    let htmlSegment = '<div class="card"><div class="card-body">' +
+                        //'<progress value="75" max="100"></progress>' + 
+                        "<a target='_blank' href='https://www.inaturalist.org/people/"+
+                        contributor.user_id+
+                        "'>" + 
+                        contributor.user.login + 
+                        "</a>: " +
+                        contributor.species_count+
+                        ' species ('+
+                        Math.round(contributor.species_count/species_count_local.total_results*100)+
+                        '%)</div></div>';
+
+                    html_people_list += htmlSegment;
+                });
+
+                let container_people = document.querySelector('.people_list');
+                container_people.innerHTML = html_people_list;
+
+
 
                 // initialise create an array of species in the area
                 species_local_array = [];
@@ -217,6 +263,7 @@
 
                 console.log(species_local_array);
 
+                // Species in the big circle
                 let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + b_rad);
                 console.log(species);
 
