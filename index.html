@@ -173,8 +173,6 @@
             // set the ui values
             document.getElementById("i_rad").value=i_rad_url;
             document.getElementById("o_rad").value=o_rad_url;
-            //document.getElementById("lat").value=lat_url;
-            //document.getElementById("lng").value=lng_url;
             document.querySelector('.i_rad_info').innerHTML = i_rad_url;
             document.querySelector('.o_rad_info').innerHTML = o_rad_url;
         } else {
@@ -236,9 +234,10 @@
             } else{
                 var o_rad = o_rad_url
             }
-            
-            
 
+            document.getElementById("lat").value=lat;
+            document.getElementById("lng").value=lng;
+            
             // radii of big and little circles in km
             //let i_rad = 1;
             //let o_rad = 5;
@@ -396,7 +395,7 @@
 
                 // Species in the big circle
                 let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad);
-                //console.log(species);
+                console.log(species);
 
                 let html_missing = '';
                 species.results.forEach(specie => {
