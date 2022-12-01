@@ -148,7 +148,7 @@
 
     <script>
 
-        
+        // Setting up the page
         // get url parameters
         var urlParams = window.location.search;
         if (urlParams.includes("?")) {
@@ -179,16 +179,9 @@
             console.log("No query paremeters provided");
         }
 
-        // apply settingsto take to new page
-        function applySettings(reset_gps){
-            if(reset_gps){
-                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
-            } else {
-                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
-            }
-            
-        }
+
         
+        // get geoposition
         if(lat_url == undefined || lng_url == undefined){
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(getPosition);
@@ -202,14 +195,14 @@
 
         async function getData(url) {
             try {
-                let res = await fetch(url);
+                let res = await fetch(url+ "&captive=false&acc_below=151");
                 return await res.json();
             } catch (error) {
                 console.log(error);
             }
         }
 
-        // initial load
+        // Main function for getting and processing data
         function getPosition(position) {
 
             // get location
@@ -224,34 +217,28 @@
                 var lng = lng_url
             }
 
+            // radii of big and little circles in km
             if(i_rad_url == null){
-                var i_rad = 1;
+                var i_rad = 1; // default inner radius
             } else{
                 var i_rad = i_rad_url
             }
             if(o_rad_url == null){
-                var o_rad = 5;
+                var o_rad = 5; // default outer radius
             } else{
                 var o_rad = o_rad_url
             }
 
+            // Update the input controls with the current lat long
             document.getElementById("lat").value=lat;
             document.getElementById("lng").value=lng;
-            
-            // radii of big and little circles in km
-            //let i_rad = 1;
-            //let o_rad = 5;
-
-            let user_id = "simonrolph";
 
             // update the link to inat explore
             var a = document.getElementById('link_to_inat');
             a.href = 'https://www.inaturalist.org/observations?place_id=any&subview=map&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad
 
-
-            // make the mini map
+            // make the mini map, add tiles etc.
             let map = L.map('map').setView([lat, lng], 13);
-
             map.options.maxZoom = 16;
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 16,
@@ -265,7 +252,7 @@
                 innerRadiusAsPercent: false,
             }).addTo(map);
 
-            // ghost donut
+            // add the ghost donut and make it stay in the centre of the map
             let donut2 = L.donut([lat, lng], {
                 radius: document.getElementById("o_rad").value * 1000,
                 innerRadius: document.getElementById("i_rad").value * 1000,
@@ -276,7 +263,7 @@
                 donut2.setLatLng(map.getCenter());
             });
 
-            // update the ghost donut based on inputs
+            // update the radii of the ghost donut based on inputs
             document.getElementById('i_rad').onchange = function() {
                 donut2.setInnerRadius(document.getElementById("i_rad").value * 1000);
             };
@@ -284,8 +271,7 @@
                 donut2.setRadius(document.getElementById("o_rad").value * 1000);
             };
             
-
-            // add the marker
+            // add the central marker
             var myIcon = L.icon({
                 iconUrl: 'images/location-pin.png',
                 iconSize: [24, 24],
@@ -293,14 +279,14 @@
             });
             L.marker([lat, lng], {icon: myIcon}).addTo(map);
 
-            // update the lat long when the map moves
+            // update the lat long inputs when the map moves
             map.addEventListener('move', function(ev) {
                 latlng = map.getCenter();
                 document.getElementById('lat').value = latlng.lat;
                 document.getElementById('lng').value = latlng.lng;
             });
 
-
+            // main function for rendering data
             async function renderData() {
                 // get the number of records for the region and the locality
                 let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0");
@@ -330,11 +316,9 @@
                     "<small> (" + ratio_value + ")</small>";
 
 
-                // Contributor tabs
+                // Build the contributor tab
                 let html_people_list = '';
                 contributors.results.forEach(contributor => {
-
-
                     let htmlSegment = '<div class="card"><div class="card-body">' +
                         //'<progress value="75" max="100"></progress>' + 
                         "<a target='_blank' href='https://www.inaturalist.org/people/"+
@@ -346,10 +330,8 @@
                         ' species ('+
                         Math.round(contributor.species_count/species_count_local.total_results*100)+
                         '%)</div></div>';
-
                     html_people_list += htmlSegment;
                 });
-
                 let container_people = document.querySelector('.people_list');
                 container_people.innerHTML = html_people_list;
 
@@ -362,7 +344,7 @@
                 let max_page = Math.floor(species_count_local.total_results / 500) + 1
                 //console.log(max_page)
 
-                // add to the array of species in the area
+                // add to the array of species in the area, whilst also building the 'species recorded' tab
                 let html_recorded = '';
                 for (let i = 1; i < (max_page + 1); i++) {
                     let species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?verifiable=true&rank=species&lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + '&page=' + i);
@@ -420,6 +402,7 @@
                 container.innerHTML = html_missing;
             }
 
+            // this actually triggers the above function
             renderData();
 
             // add all records onto map
@@ -430,7 +413,7 @@
                 attribution: 'iNaturalist'
             }).addTo(map);
 
-            // add user records onto map
+            // add user records onto map (this is not implemented yet)
             //L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=green&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&user_id=" + user_id, {
             //   maxZoom: 19,
             //    opacity: 0.3,
@@ -438,6 +421,15 @@
             //}).addTo(map);
         }
 
+
+        // apply settings to take to new page - used as onClick
+        function applySettings(reset_gps){
+            if(reset_gps){
+                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
+            } else {
+                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
+            }
+        }
 
     </script>
 
