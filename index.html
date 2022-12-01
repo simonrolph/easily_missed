@@ -204,7 +204,7 @@
 
         async function getData(url) {
             try {
-                let res = await fetch(url+ "&verifiable=true&rank=species&captive=false&acc_below=151" + extra_params);
+                let res = await fetch(url+ "&verifiable=true&rank=species" + extra_params);
                 return await res.json();
             } catch (error) {
                 console.log(error);
