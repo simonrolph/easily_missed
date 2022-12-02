@@ -455,9 +455,9 @@
         // apply settings to take to new page - used as onClick
         function applySettings(reset_gps){
             if(reset_gps){
-                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value+extra_params;
+                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
             } else {
-                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value+extra_params;
+                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
             }
         }
 
