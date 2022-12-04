@@ -11,6 +11,7 @@
         crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
         crossorigin="" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
     <link rel="stylesheet" type="text/css" href="styles.css" />
 
@@ -22,7 +23,7 @@
         crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/gh/Falke-Design/L.Donut@latest/src/L.Donut.js"></script>
 
-    <title>Easily missed</title>
+    <title>Easily Missed - find data gaps in iNaturalist</title>
     <link rel="canonical" href="https://simonrolph.github.io/easily_missed/" />
     <link rel="manifest" href="/easily_missed/manifest.webmanifest">
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
@@ -31,20 +32,66 @@
 <body>
 
     <div class="container">
-        <p style="text-align-last: right"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20Easily%20Missed,%20an%20app%20to%20help%20recorders%20identify%20local%20gaps%20in%20species%20records">Tweet</a></p>
+        <div class="progress" id="progbar">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">Waiting for GPS</div>
+        </div>
+        <!--<p style="text-align-last: right"><a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Check%20out%20Easily%20Missed,%20an%20app%20to%20help%20recorders%20identify%20local%20gaps%20in%20species%20records">Tweet</a></p>-->
         <div class="error_message"></div>
         <h1>"Easily missed"</h1>
-        <h3>Build a more complete picture of the wildlife in your local area</h3>
-        <p>"Easily Missed" is a tool to help <a href="https://www.inaturalist.org/" target="_blank">iNaturalist</a> recorders identify local gaps in species records. The tool builds a list of species that have been recorded in your region (within 5km of where you are). The tool then helps you prioritise species to fill data gaps by determining which of these species haven't been recorded in your local area (within 1km). By filling local data gaps you'll boost your area's "doughnut score"; the percentage of species recorded locally compared to the wider region. The +/- numbers indicate change over the past 30 days. This a work in progress so <a target="_blank" href="https://forum.inaturalist.org/t/a-tool-to-help-you-fill-local-data-gaps-easily-missed/37575/">please give feedback</a>!</p>
+        <h4>Build a more complete picture of the wildlife in your local area</h4>
+        <p><a data-bs-toggle="modal" data-bs-target="#infoModal" href=""><i class="bi bi-info-circle"></i> Getting started</a> -  <a href="#species_lists"> <i class="bi bi-arrow-down-circle"></i> Skip to species lists</a> - <a id="link_to_inat" target="_blank" href=""><i class="bi bi-box-arrow-up-right"></i> Explore area on iNaturalist </a> </p>
         
-        <p>
-            <a type="button" class="btn btn-outline-primary" href="#species_lists">Skip to species lists</a> 
-            <button type="button" class="btn btn-outline-primary" id="copylistbutton" onclick="copyList()" disabled>Copy list</button>
-            <button type="button" class="btn btn-outline-primary" onclick="applySettings(false)">Move doughnut to new location</button>
-            <button type="button" class="btn btn-outline-primary" onclick="applySettings(true)">Return to GPS location</button>
-            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#collapseOptions" aria-expanded="false" aria-controls="collapseOptions">Advanced options</button>
-        </p>        
-  
+        
+
+        <!-- Modal -->
+        <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Back</button>
+                    </div>
+                    <div class="modal-body">
+                        <h4>What is "Easily Missed"?</h4>
+                        <p>"Easily Missed" is a tool to help <a href="https://www.inaturalist.org/" target="_blank">iNaturalist</a> observers identify local gaps in species records. It make suggestions of what species you should submit to iNaturalist.</p>
+
+                        <h4>How does it work?</h4>
+
+                        <p>Firstly, the tool builds a list of species that have been recorded in your region (by default this is within 5km of where you are). The tool then helps you prioritise species to fill data gaps by determining which of these species haven't been recorded in your local area (by default within 1km). Essentially:
+                        </p>
+                        <img src="images/diagram.svg" class="img-fluid">
+                        <p>By filling local data gaps you'll boost your area's "doughnut score"; the percentage of species recorded locally compared to the wider region. It's an indicator not a target. The wider region might contain species that can't be found in your local area. The +/- numbers indicate change over the past 30 days.</p>
+
+                        <h4>Advanced</h4>
+
+                        <p>You can alter the radius of the doughnut and the doughnut hole through the advanced options.</p>
+
+                        <p>You can also provide parameters into the tool's URL which will affect the data that it gets from iNaturalist. This is much like you can use the search URL on the main iNaturalist website: <a href="https://www.inaturalist.org/pages/search+urls" target="_blank">https://www.inaturalist.org/pages/search+urls</a> </p>
+                            
+                        <p>For example if you're only interested in birds you could add this the URL <code>?iconic_taxa=Aves</code>. Try it out <a href="?iconic_taxa=Aves">here</a>.</p>
+
+                        <h4>Provide feedback</h4>
+                        
+                        <p>This a work in progress so <a target="_blank" href="https://forum.inaturalist.org/t/a-tool-to-help-you-fill-local-data-gaps-easily-missed/37575/">please give feedback on the iNaturalist forum</a>!</p>
+
+                        <p>If you use GitHub you can submit issues about bugs or feature requests <a href="https://github.com/simonrolph/easily_missed/issues">here</a>.</p>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- map -->
+        <div id="map" style="height: 420px;"></div>
+        
+        <div style="text-align: center;padding-top:10px;">
+                <button type="button" class="btn btn-outline-primary" onclick="applySettings(false)"><i class="bi bi-pin-map-fill"></i> Move doughnut to new location</button>
+                <button type="button" class="btn btn-outline-primary" onclick="applySettings(true)"><i class="bi bi-globe"></i> Return to GPS location</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#collapseOptions" aria-expanded="false" aria-controls="collapseOptions"><i class="bi bi-gear"></i> Advanced options</button>
+        </div>
+                
+        
         <!-- Advanced options -->
         <div class="collapse" id="collapseOptions">
             <div class="card card-body">
@@ -64,10 +111,6 @@
                 <button type="button" class="btn btn-outline-success" onclick="applySettings(false)">Apply settings</button>
             </div>
         </div>
-
-        <!-- map -->
-        <div id="map" style="height: 420px;"></div>
-        <p style="text-align: right"><a id="link_to_inat" target="_blank">Explore area on iNaturalist</a></p>
         <br>
 
         <!-- headline numbers -->
@@ -105,7 +148,8 @@
         <div class="tab-content" id="species_list2">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <p>Species (and number of records) which have <b>not</b> been within 1km of where you are, but have been recorded within
-                    5km. Record these species to fill local data gaps.</p>
+                    5km. Record these species to fill local data gaps.
+                    <a href="javascript:;" id="copylistbutton" onclick="copyList()" disabled><i class="bi bi-clipboard"></i> Copy list to clipboard</a></p>
                 <div class="species_list">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -151,6 +195,9 @@
     </div>
 
     <script>
+        // set up the progress bar
+        var bar = document.getElementsByClassName("progress-bar")[0];
+        bar.style.width = "5%";
 
         // Setting up the page
         // get url parameters
@@ -180,6 +227,18 @@
             document.getElementById("i_rad").value=i_rad_url;
             document.getElementById("o_rad").value=o_rad_url;
 
+
+            // remove the protected variables (lat/lng/i_rad/o_rad)
+            // this is quite clunky but it works
+            var to_remove = [];
+            params.forEach(param => {
+                if(param.startsWith("lat") || param.startsWith("lng") || param.startsWith("i_rad") || param.startsWith("o_rad") ){
+                    to_remove.push(param);
+                }
+            });
+            for (var i = to_remove.length -1; i >= 0; i--)
+                params.splice(to_remove[i],1);         
+
     
             var extra_params = "&"+params.join("&");
             console.log(extra_params);
@@ -187,6 +246,8 @@
             console.log("No query paremeters provided");
             var extra_params = "";
         }
+
+        
 
 
         
@@ -205,6 +266,7 @@
         async function getData(url) {
             try {
                 let res = await fetch(url+ "&verifiable=true&rank=species" + extra_params);
+                console.log("Making request to iNaturalist API:" + url);
                 return await res.json();
             } catch (error) {
                 console.log(error);
@@ -237,6 +299,10 @@
             } else{
                 var o_rad = o_rad_url
             }
+
+            // fixed number of decimal places 
+            lat = Number(lat).toFixed(6);
+            lng = Number(lng).toFixed(6);
 
             console.log("latitude: "+lat);
             console.log("longitude: "+lng);
@@ -307,6 +373,8 @@
 
             // main function for rendering data
             async function renderData() {
+                bar.style.width = "20%";
+                bar.innerHTML = "Getting summary";
                 // get the number of records for the region and the locality
                 let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0");
                 let species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0");
@@ -320,7 +388,7 @@
                 // Get the contributors
                 let contributors = await getData('https://api.inaturalist.org/v1/observations/observers?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad);
                 //console.log(contributors); 
-
+                
                 
 
                 // update the headline figures for species counts
@@ -333,7 +401,8 @@
                 if (ratio_value > 0) { ratio_value = "+" + ratio_value };
                 ratio.innerHTML = (100 * (species_count_local.total_results / species_count.total_results)).toFixed(2) + "%" +
                     "<small> (" + ratio_value + ")</small>";
-
+                bar.style.width = "30%";
+                bar.innerHTML = "Getting contributors";
 
                 // Build the contributor tab
                 let html_people_list = '';
@@ -353,7 +422,8 @@
                 });
                 let container_people = document.querySelector('.people_list');
                 container_people.innerHTML = html_people_list;
-
+                bar.style.width = "40%";
+                bar.innerHTML = "Getting list of recorded species";
 
 
                 // initialise create an array of species in the area
@@ -362,6 +432,7 @@
                 // how many pages of results do I have to go through?
                 let max_page = Math.floor(species_count_local.total_results / 500) + 1
                 console.log("Gathering species list from this many pages:"+max_page)
+
 
                 // add to the array of species in the area, whilst also building the 'species recorded' tab
                 let html_recorded = '';
@@ -390,7 +461,8 @@
                     container.innerHTML = html_recorded;
 
                 }
-
+                bar.style.width = "60%";
+                bar.innerHTML = "Generating missing species list";
                 //console.log(species_local_array);
 
                 // Species in the big circle
@@ -398,7 +470,8 @@
                 console.log(species);
 
                 let html_missing = '';
-                let html_missing_clipboard = '';
+                let html_missing_clipboard = '';              
+                
                 species.results.forEach(specie => {
                     if (!(species_local_array.includes(specie.taxon.name))) {
                         var record_plurality = "record";
@@ -421,15 +494,24 @@
                 });
 
                 let container = document.querySelector('.species_list');
-                container.innerHTML = html_missing;
-
                 let container2 = document.querySelector('.clip_board');
+                container.innerHTML = html_missing;
                 container2.innerHTML = html_missing_clipboard;
 
                 // undisable the copy list button
                 document.querySelector('#copylistbutton').disabled = false;
-            }
+                bar.style.width = "100%";
+                bar.innerHTML = "Let's go!";
 
+                // hide the progress bar
+                setTimeout(function(){
+                    var progressbar = document.getElementById("progbar");
+                    console.log(progressbar);
+                    progressbar.style.opacity = '0';
+                }, 500);
+                
+            }
+            
             // this actually triggers the above function
             renderData();
 
@@ -455,9 +537,9 @@
         // apply settings to take to new page - used as onClick
         function applySettings(reset_gps){
             if(reset_gps){
-                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
+                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value +extra_params;
             } else {
-                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value;
+                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value +extra_params;
             }
         }
 

@@ -23,3 +23,13 @@ h1{
     font-family: 'Caveat', cursive;
     font-size: 70px;
 }
+
+h3{
+    font-size: 30px;
+}
+
+#progbar {
+    opacity: 1;
+    -webkit-transition: opacity 500ms linear;
+    transition: opacity 500ms linear;
+}
