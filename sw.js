@@ -8,7 +8,7 @@ var APP_PREFIX = 'em_';
 // you need to change this version (version_01, version_02…). 
 // If you don't change the version, the service worker will give your
 // users the old files!
-var VERSION = 'version_11';
+var VERSION = 'version_12';
 
 // The files to make available for offline use. make sure to add 
 // others to this list
@@ -17,8 +17,10 @@ var URLS = [
   `${GHPATH}/index.html`,
   `${GHPATH}/styles.css`,
   `${GHPATH}/images/favicon.ico`,
-  `${GHPATH}/images/image.png`
-  `${GHPATH}/images/diagram.svg`
+  `${GHPATH}/images/image.png`,
+  `${GHPATH}/images/diagram.svg`,
+  `${GHPATH}/images/location-pin.png`,
+  `${GHPATH}//images/icon_green4.png`
 ]
 
 var CACHE_NAME = APP_PREFIX + VERSION

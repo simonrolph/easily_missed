@@ -3,7 +3,7 @@
     "name": "Easily Missed",
     "short_name": "EM",
     // Description what your app is
-    "description": "Missing local records of regionally common species",
+    "description": "Build a more complete picture of the wildlife in your local area",
   
     // Scope and start URL - these need to change to yours
     "scope": "/easily_missed/",
@@ -22,9 +22,9 @@
     // you may not be able to install the app. 
     "icons": [
         {
-          "src": "/easily_missed/image.png",
+          "src": "/easily_missed/images/icon_green4.png",
           "type": "image/png",
-          "sizes": "327x265"
+          "sizes": "250x250"
         }
     ]
   }

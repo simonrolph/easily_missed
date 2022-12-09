@@ -147,8 +147,8 @@
         </ul>
         <div class="tab-content" id="species_list2">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <p>Species (and number of records) which have <b>not</b> been within 1km of where you are, but have been recorded within
-                    5km. Record these species to fill local data gaps.
+                <p>Species (and number of records) which have <b>not</b> been within <span class="i_rad_info">1</span>km of where you are, but have been recorded within
+                    <span class="o_rad_info">5</span>km. Record these species to fill local data gaps.
                     <a href="javascript:;" id="copylistbutton" onclick="copyList()" disabled><i class="bi bi-clipboard"></i> Copy list to clipboard</a></p>
                 <div class="species_list">
                     <div class="d-flex justify-content-center">
@@ -160,7 +160,7 @@
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <p>Species (and number of records) which have been recorded within 1km of where you are.</p>
+                <p>Species (and number of records) which have been recorded within <span class="i_rad_info">1</span>km of where you are.</p>
                 <div class="species_list_recorded">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -171,7 +171,7 @@
             </div>
 
             <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="profile-tab">
-                <p>Local contributors who have recorded species within 1km of where you are, and the percentage of the local area's species they recorded.</p>
+                <p>Local contributors who have recorded species within <span class="i_rad_info">1</span>km of where you are, and the percentage of the local area's species they recorded.</p>
                 <div class="people_list">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -315,8 +315,13 @@
             document.getElementById("lng").value=lng;
             document.getElementById("i_rad").value=i_rad;
             document.getElementById("o_rad").value=o_rad;
-            document.querySelector('.i_rad_info').innerHTML = i_rad;
-            document.querySelector('.o_rad_info').innerHTML = o_rad;
+
+            document.querySelectorAll('.i_rad_info').forEach(i_rad_in =>{
+                i_rad_in.innerHTML = i_rad;
+            })
+            document.querySelectorAll('.o_rad_info').forEach(o_rad_in =>{
+                o_rad_in.innerHTML = o_rad;
+            })
 
             // update the link to inat explore
             var a = document.getElementById('link_to_inat');
@@ -380,7 +385,8 @@
                 let species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0");
 
                 let today = new Date();
-                let priorDate = new Date(new Date().setDate(today.getDate() - 30));
+                let priorDate = new Date(new Date().setDate(today.getDate() - 30)).toISOString().split('T')[0];
+                console.log(priorDate);
                 let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0" + "&d2=" + priorDate);
                 let species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0" + "&d2=" + priorDate);
                 //console.log(species_count_old);
@@ -428,6 +434,7 @@
 
                 // initialise create an array of species in the area
                 species_local_array = [];
+                species_id_local_array = [];
 
                 // how many pages of results do I have to go through?
                 let max_page = Math.floor(species_count_local.total_results / 500) + 1
@@ -441,6 +448,7 @@
                     //console.log(species_local);
                     species_local.results.forEach(specie => {
                         species_local_array.push(specie.taxon.name);
+                        species_id_local_array.push(specie.taxon.id);
 
                         var record_plurality = "record";
                         if (specie.count > 1) {
@@ -460,13 +468,15 @@
                     let container = document.querySelector('.species_list_recorded');
                     container.innerHTML = html_recorded;
 
+                    console.log();
+
                 }
                 bar.style.width = "60%";
                 bar.innerHTML = "Generating missing species list";
                 //console.log(species_local_array);
 
                 // Species in the big circle
-                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad);
+                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&without_taxon_id=" + species_id_local_array.slice(0, 499).join());
                 console.log(species);
 
                 let html_missing = '';
@@ -506,7 +516,6 @@
                 // hide the progress bar
                 setTimeout(function(){
                     var progressbar = document.getElementById("progbar");
-                    console.log(progressbar);
                     progressbar.style.opacity = '0';
                 }, 500);
                 
