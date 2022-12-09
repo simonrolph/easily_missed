@@ -33,3 +33,10 @@ h3{
     -webkit-transition: opacity 500ms linear;
     transition: opacity 500ms linear;
 }
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 15%;
+  }
