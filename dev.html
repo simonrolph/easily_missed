@@ -226,6 +226,15 @@
             if((params.findIndex(params => params.includes("lng")))>-1){ // get the outer radius
                 var lng_url = params[params.findIndex(params => params.includes("lng"))].split("=")[1];
             }
+            if((params.findIndex(params => params.includes("i_place_id")))>-1){ // get the place_id
+                var i_place_id_url = params[params.findIndex(params => params.includes("i_place_id"))].split("=")[1];
+                var use_place_shape = true;
+                console.log("Using inner place shape");
+            } else {
+                var use_place_shape = false;
+            }
+
+
 
             // set the ui values
             document.getElementById("i_rad").value=i_rad_url;
@@ -236,7 +245,7 @@
             // this is quite clunky but it works
             var to_remove = [];
             params.forEach(param => {
-                if(param.startsWith("lat") || param.startsWith("lng") || param.startsWith("i_rad") || param.startsWith("o_rad") ){
+                if(param.startsWith("lat") || param.startsWith("lng") || param.startsWith("i_rad") || param.startsWith("o_rad") || param.startsWith("i_place_id") ){
                     to_remove.push(param);
                 }
             });
@@ -277,19 +286,45 @@
             }
         }
 
+        async function getDataBasic(url) {
+            try {
+                let res = await fetch(url);
+                console.log("Making request to iNaturalist API:" + url);
+                return await res.json();
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        async function getPlace(){
+            let place = await getDataBasic('https://api.inaturalist.org/v1/places/'+i_place_id_url);
+            console.log(place);
+        }
+
+
+
         // Main function for getting and processing data
-        function getPosition(position) {
+        async function getPosition(position) {
+            
 
             // get location
-            if(lat_url == null){
-                var lat = position.coords.latitude;
-            } else{
-                var lat = lat_url
-            }
-            if(lng_url == null){
-                var lng = position.coords.longitude;
-            } else{
-                var lng = lng_url
+            if(use_place_shape){
+                let place = await getDataBasic('https://api.inaturalist.org/v1/places/'+i_place_id_url);
+                console.log(place);
+                var lat = place.results[0].location.split(",")[0]
+                var lng = place.results[0].location.split(",")[1]
+                var place_geojson = place.results[0].geometry_geojson;
+            } else {
+                if(lat_url == null){
+                    var lat = position.coords.latitude;
+                } else{
+                    var lat = lat_url
+                }
+                if(lng_url == null){
+                    var lng = position.coords.longitude;
+                } else{
+                    var lng = lng_url
+                }
             }
 
             // radii of big and little circles in km
@@ -373,6 +408,15 @@
             });
             L.marker([lat, lng], {icon: myIcon}).addTo(map);
 
+            //add the place if needed
+            if(use_place_shape){
+                
+                L.geoJSON(place_geojson).addTo(map);
+
+
+            };
+            
+
             // update the lat long inputs when the map moves
             map.addEventListener('move', function(ev) {
                 latlng = map.getCenter();
@@ -382,17 +426,31 @@
 
             // main function for rendering data
             async function renderData() {
+                
+
                 bar.style.width = "20%";
                 bar.innerHTML = "Getting summary";
                 // get the number of records for the region and the locality
                 let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0");
-                let species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0");
+                
+                if(use_place_shape){
+                    var species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url +  "&per_page=0");
+                } else {
+                    var species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0");
+                };
+
+                
 
                 let today = new Date();
                 let priorDate = new Date(new Date().setDate(today.getDate() - 30)).toISOString().split('T')[0];
                 console.log(priorDate);
                 let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0" + "&d2=" + priorDate);
-                let species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0" + "&d2=" + priorDate);
+                
+                if(use_place_shape){
+                    var species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url +  "&per_page=0"+ "&d2=" + priorDate);
+                } else {
+                    var species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0" + "&d2=" + priorDate);
+                };
                 //console.log(species_count_old);
 
                 // Get the contributors
@@ -441,14 +499,20 @@
                 species_id_local_array = [];
 
                 // how many pages of results do I have to go through?
-                let max_page = Math.floor(species_count_local.total_results / 500) + 1
+                let max_page = Math.min(Math.floor(species_count_local.total_results / 500) + 1,5);
+
                 console.log("Gathering species list from this many pages:"+max_page)
 
 
                 // add to the array of species in the area, whilst also building the 'species recorded' tab
                 let html_recorded = '';
                 for (let i = 1; i < (max_page + 1); i++) {
-                    let species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + '&page=' + i);
+                    if(use_place_shape){
+                        var species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url + '&page=' + i);
+                    } else {
+                        var species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + '&page=' + i);
+                    };
+                    
                     //console.log(species_local);
                     species_local.results.forEach(specie => {
                         species_local_array.push(specie.taxon.name);
