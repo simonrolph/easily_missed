@@ -117,11 +117,11 @@
         <div class="row" style="text-align: center;">
             <div class="col-sm">
                 <h3 class="sp_count_1">-</h3>
-                <p>Species recorded within <span class="i_rad_info">1</span>km</p>
+                <p>Species recorded within <span class="i_rad_info">1km</span></p>
             </div>
             <div class="col-sm">
                 <h3 class="sp_count_2">-</h3>
-                <p>Species recorded within <span class="o_rad_info">5</span>km</p>
+                <p>Species recorded within <span class="o_rad_info">5km</span></p>
             </div>
             <div class="col-sm">
                 <h3 class="ratio">-</h3>
@@ -147,8 +147,8 @@
         </ul>
         <div class="tab-content" id="species_list2">
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                <p>Species (and number of records) which have <b>not</b> been within <span class="i_rad_info">1</span>km of where you are, but have been recorded within
-                    <span class="o_rad_info">5</span>km. Record these species to fill local data gaps.
+                <p>Species (and number of records) which have <b>not</b> been within <span class="i_rad_info">1km</span> of where you are, but have been recorded within
+                    <span class="o_rad_info">5km</span>. Record these species to fill local data gaps.
                     <a href="javascript:;" id="copylistbutton" onclick="copyList()" disabled><i class="bi bi-clipboard"></i> Copy list to clipboard</a></p>
                 <div class="species_list">
                     <div class="d-flex justify-content-center">
@@ -160,7 +160,7 @@
             </div>
 
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                <p>Species (and number of records) which have been recorded within <span class="i_rad_info">1</span>km of where you are.</p>
+                <p>Species (and number of records) which have been recorded within <span class="i_rad_info">1km</span> of where you are.</p>
                 <div class="species_list_recorded">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -171,7 +171,7 @@
             </div>
 
             <div class="tab-pane fade" id="people" role="tabpanel" aria-labelledby="profile-tab">
-                <p>Local contributors who have recorded species within <span class="i_rad_info">1</span>km of where you are, and the percentage of the local area's species they recorded.</p>
+                <p>Local contributors who have recorded species within <span class="i_rad_info">1km</span> of where you are, and the percentage of the local area's species they recorded.</p>
                 <div class="people_list">
                     <div class="d-flex justify-content-center">
                         <div class="spinner-border" role="status">
@@ -203,82 +203,11 @@
         var bar = document.getElementsByClassName("progress-bar")[0];
         bar.style.width = "5%";
 
-        // Setting up the page
-        // get url parameters
-        var urlParams = window.location.search;
-        if (urlParams.includes("?")) {
-            console.log(urlParams);
-            var getQuery = urlParams.split('?')[1];
-            var params = getQuery.split('&');
-            console.log("Custom URL parameters supplied:")
-            console.log(params);
-
-            // set variables to for radii and lat/lon
-            if((params.findIndex(params => params.includes("i_rad")))>-1){ // get the inner radius
-                var i_rad_url = params[params.findIndex(params => params.includes("i_rad"))].split("=")[1];
-            }
-            if((params.findIndex(params => params.includes("o_rad")))>-1){ // get the outer radius
-                var o_rad_url = params[params.findIndex(params => params.includes("o_rad"))].split("=")[1];
-            }
-            if((params.findIndex(params => params.includes("lat")))>-1){ // get the lat
-                var lat_url = params[params.findIndex(params => params.includes("lat"))].split("=")[1];
-            }
-            if((params.findIndex(params => params.includes("lng")))>-1){ // get the outer radius
-                var lng_url = params[params.findIndex(params => params.includes("lng"))].split("=")[1];
-            }
-            if((params.findIndex(params => params.includes("i_place_id")))>-1){ // get the place_id
-                var i_place_id_url = params[params.findIndex(params => params.includes("i_place_id"))].split("=")[1];
-                var use_place_shape = true;
-                console.log("Using inner place shape");
-            } else {
-                var use_place_shape = false;
-            }
-
-
-
-            // set the ui values
-            document.getElementById("i_rad").value=i_rad_url;
-            document.getElementById("o_rad").value=o_rad_url;
-
-
-            // remove the protected variables (lat/lng/i_rad/o_rad)
-            // this is quite clunky but it works
-            var to_remove = [];
-            params.forEach(param => {
-                if(param.startsWith("lat") || param.startsWith("lng") || param.startsWith("i_rad") || param.startsWith("o_rad") || param.startsWith("i_place_id") ){
-                    to_remove.push(param);
-                }
-            });
-            for (var i = to_remove.length -1; i >= 0; i--)
-                params.splice(to_remove[i],1);         
-
-    
-            var extra_params = "&"+params.join("&");
-            console.log(extra_params);
-        } else {
-            console.log("No query paremeters provided");
-            var extra_params = "";
-        }
-
         
-
-
-        
-        // get geoposition
-        if(lat_url == undefined || lng_url == undefined){
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(getPosition);
-            } else {
-                // This doesn't actually get triggered for some reason
-                alert("GPS needed");
-            }
-        } else {
-            getPosition(null);
-        }
-
+        // get species lists
         async function getData(url) {
             try {
-                let res = await fetch(url+ "&verifiable=true&rank=species" + extra_params);
+                let res = await fetch(url+ "&verifiable=true&rank=species");
                 console.log("Making request to iNaturalist API:" + url);
                 return await res.json();
             } catch (error) {
@@ -286,6 +215,7 @@
             }
         }
 
+        // generic 
         async function getDataBasic(url) {
             try {
                 let res = await fetch(url);
@@ -296,93 +226,298 @@
             }
         }
 
+        // places
         async function getPlace(){
             let place = await getDataBasic('https://api.inaturalist.org/v1/places/'+i_place_id_url);
             console.log(place);
         }
 
+        function getValue(value){
+            value.split("=")[1];
+        }
 
+        // Setting up the page
+        // get url parameters
+        var urlParams = window.location.search;
+        // process url parameters if there are any
+        if (urlParams.includes("?")) {
+            var getQuery = urlParams.split('?')[1];
+            var params_raw = getQuery.split('&');
+            console.log("Custom URL parameters supplied:");
+            console.log(params_raw);
+
+            var params_i = [];
+            var params_o = [];
+            var params_generic = [];   
+
+            var params_i_names = [];
+            var params_o_names = [];
+            var params_generic_names = [];        
+
+            // split parameters to innies, outies or neither
+            params_raw.forEach(param => {
+                if(param.startsWith("i_")){
+                    params_i.push(param.slice(2));
+                    params_i_names.push(param.slice(2).split("=")[0]);
+                } else if(param.startsWith("o_")){
+                    params_o.push(param.slice(2));
+                    params_o_names.push(param.slice(2).split("=")[0]);
+                } else {
+                    params_generic.push(param);
+                    params_generic_names.push(param.split("=")[0]);
+                }
+            });
+
+            // add generic parameters to inners and outers
+            var params_i_full = params_i.concat(params_generic);
+            var params_i_full_names = params_i_names.concat(params_generic_names);
+            var params_o_full = params_o.concat(params_generic);
+            var params_o_full_names = params_o_names.concat(params_generic_names);
+            var params_generic_full = params_generic;
+            var params_generic_full_names = params_generic_names;
+
+            var params_i_full_no_spatial = params_i.filter(e => !e.startsWith("lat")).filter(e => !e.startsWith("lng"));
+            var params_o_full_no_spatial = params_o.filter(e => !e.startsWith("lat")).filter(e => !e.startsWith("lng"));
+
+            console.log("Non spatial parameters supplied:");
+            console.log(params_i_full_no_spatial);
+            console.log(params_o_full_no_spatial);
+
+            // show me what you've got
+            console.log("Inner parameters supplied:");
+            console.log(params_i_full);
+            console.log(params_i_full_names);
+            console.log("Outer parameters supplied:");
+            console.log(params_o_full);
+            console.log(params_o_full_names);
+            console.log("Generic parameters supplied:");
+            console.log(params_generic_full);
+            console.log(params_generic_full_names);
+
+            
+
+
+
+
+
+
+
+            // work out what shapes we're mapping
+            // var shape_i = "circle"; //default unless changed
+            // var shape_o = "circle"; //default unless changed
+
+            
+
+            // // inner shape or circle
+            // if((params.findIndex(params => params.includes("i_place_id")))>-1){ // get the place_id if there is one
+            //     var i_place_id_url = params[params.findIndex(params => params.includes("i_place_id"))].split("=")[1];
+            //     var shape_i = "poly";
+            //     console.log("Using inner place shape");
+            // } else if((params.findIndex(params => params.includes("i_rad")))>-1){ // if there's no place id then get radius
+            //     var i_rad_url = params[params.findIndex(params => params.includes("i_rad"))].split("=")[1];
+            // }
+
+            // // outer shape or circle
+            // if((params.findIndex(params => params.includes("i_place_id")))>-1){ // get the place_id if there is one
+            //     var i_place_id_url = params[params.findIndex(params => params.includes("i_place_id"))].split("=")[1];
+            //     var shape_i = "poly";
+            //     console.log("Using inner place shape");
+            // } else if((params.findIndex(params => params.includes("i_rad")))>-1){ // if there's no place id then get radius
+            //     var i_rad_url = params[params.findIndex(params => params.includes("i_rad"))].split("=")[1];
+            // }
+
+
+
+            // // set variables to for radii and lat/lon
+            
+            // if((params.findIndex(params => params.includes("o_rad")))>-1){ // get the outer radius
+            //     var o_rad_url = params[params.findIndex(params => params.includes("o_rad"))].split("=")[1];
+            // }
+            // if((params.findIndex(params => params.includes("lat")))>-1){ // get the lat
+            //     var lat_url = params[params.findIndex(params => params.includes("lat"))].split("=")[1];
+            // }
+            // if((params.findIndex(params => params.includes("lng")))>-1){ // get the outer radius
+            //     var lng_url = params[params.findIndex(params => params.includes("lng"))].split("=")[1];
+            // }
+
+
+
+            
+
+
+            // // remove the protected variables (lat/lng/i_rad/o_rad)
+            // // this is quite clunky but it works
+            // var to_remove = [];
+            // params.forEach(param => {
+            //     if(param.startsWith("lat") || param.startsWith("lng") || param.startsWith("i_rad") || param.startsWith("o_rad") || param.startsWith("i_place_id") ){
+            //         to_remove.push(param);
+            //     }
+            // });
+            // for (var i = to_remove.length -1; i >= 0; i--)
+            //     params.splice(to_remove[i],1);         
+
+    
+        } else {
+            console.log("No query paremeters provided");
+            var params_i_full_names = [];
+            var params_o_full_names = [];
+            var params_generic_full_names = []; 
+            var params_i_full = [];
+            var params_o_full = [];
+            var params_generic_full = [];
+            var params_i_full_no_spatial = [];
+            var params_o_full_no_spatial = [];
+
+        }
+
+        // get geoposition
+        if(true){
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(getPosition);
+            } else {
+                // This doesn't actually get triggered for some reason
+                alert("GPS needed");
+            }
+        } else {
+            getPosition(null);
+        }
 
         // Main function for getting and processing data
         async function getPosition(position) {
+
+            // if no inner place provided
+            if(!params_i_full_names.includes("place_id")){
+                var i_shape = "circle";
+                // //if lat is missing
+                if(!params_i_full_names.includes("lat")){
+                    params_i_full_names.push("lat");
+                    params_i_full.push("lat="+position.coords.latitude);
+                }
+                // and if lng is missing
+                if(!params_i_full_names.includes("lng")){
+                    params_i_full_names.push("lng");
+                    params_i_full.push("lng="+position.coords.longitude);
+                }
+                // and if rad is missing
+                if(!params_i_full_names.includes("radius")){
+                    params_i_full_names.push("radius");
+                    params_i_full.push("radius="+1);
+                }
+                var i_descript = params_i_full[params_i_full_names.indexOf("radius")].split("=")[1]+"km";
+                var map_lat = params_i_full[params_i_full_names.indexOf("lat")].split("=")[1];
+                var map_lng = params_i_full[params_i_full_names.indexOf("lng")].split("=")[1];
+                document.getElementById("i_rad").value=params_i_full[params_i_full_names.indexOf("radius")].split("=")[1];
+            } else {
+                var i_shape = "poly";
+                let place_i = await getDataBasic('https://api.inaturalist.org/v1/places/'+params_i_full[params_i_full_names.indexOf("place_id")].split("=")[1]);
+                console.log(place_i);
+                var place_i_geojson = place_i.results[0].geometry_geojson;
+                var i_descript = place_i.results[0].name;
+                var map_lat = place_i.results[0].location.split(",")[0];
+                var map_lng = place_i.results[0].location.split(",")[1];
+                document.getElementById("i_rad").value=1;
+            }
+
             
 
-            // get location
-            if(use_place_shape){
-                let place = await getDataBasic('https://api.inaturalist.org/v1/places/'+i_place_id_url);
-                console.log(place);
-                var lat = place.results[0].location.split(",")[0]
-                var lng = place.results[0].location.split(",")[1]
-                var place_geojson = place.results[0].geometry_geojson;
+            
+            
+            // if no outer place provided
+            if(!params_o_full_names.includes("place_id")){
+                var o_shape = "circle";
+                // //if lat is missing
+                if(!params_o_full_names.includes("lat")){
+                    params_o_full_names.push("lat");
+                    params_o_full.push("lat="+position.coords.latitude);
+                }
+                // and if lng is missing
+                if(!params_o_full_names.includes("lng")){
+                    params_o_full_names.push("lng");
+                    params_o_full.push("lng="+position.coords.longitude);
+                }
+                // and if rad is missing
+                if(!params_o_full_names.includes("radius")){
+                    params_o_full_names.push("radius");
+                    params_o_full.push("radius="+5);
+                }
+                var o_descript = params_o_full[params_o_full_names.indexOf("radius")].split("=")[1]+"km";
+                document.getElementById("o_rad").value=params_o_full[params_o_full_names.indexOf("radius")].split("=")[1];
             } else {
-                if(lat_url == null){
-                    var lat = position.coords.latitude;
-                } else{
-                    var lat = lat_url
-                }
-                if(lng_url == null){
-                    var lng = position.coords.longitude;
-                } else{
-                    var lng = lng_url
-                }
+                var o_shape = "poly";
+                let place_o = await getDataBasic('https://api.inaturalist.org/v1/places/'+params_o_full[params_o_full_names.indexOf("place_id")].split("=")[1]);
+                console.log(place_o);
+                var place_o_geojson = place_o.results[0].geometry_geojson;
+                var o_descript = place_o.results[0].name;
+                document.getElementById("o_rad").value=5;
             }
 
-            // radii of big and little circles in km
-            if(i_rad_url == null){
-                var i_rad = 1; // default inner radius
-            } else{
-                var i_rad = i_rad_url
-            }
-            if(o_rad_url == null){
-                var o_rad = 5; // default outer radius
-            } else{
-                var o_rad = o_rad_url
-            }
+            // set the ui values
+            
+            
+            console.log("Inner parameters full:")
+            console.log(params_i_full);
+            console.log("Outer parameters full:")
+            console.log(params_o_full);
 
-            // fixed number of decimal places 
-            lat = Number(lat).toFixed(6);
-            lng = Number(lng).toFixed(6);
+            
 
-            console.log("latitude: "+lat);
-            console.log("longitude: "+lng);
+            // // fixed number of decimal places 
+            // lat = Number(lat).toFixed(6);
+            // lng = Number(lng).toFixed(6);
 
-            console.log("inner radius: "+i_rad);
-            console.log("outer radius: "+o_rad);
-
-            // Update the input controls with the current lat long
-            document.getElementById("lat").value=lat;
-            document.getElementById("lng").value=lng;
-            document.getElementById("i_rad").value=i_rad;
-            document.getElementById("o_rad").value=o_rad;
+            // // Update the input controls with the current lat long
+            document.getElementById("lat").value=map_lat;
+            document.getElementById("lng").value=map_lng;
+            
+            
 
             document.querySelectorAll('.i_rad_info').forEach(i_rad_in =>{
-                i_rad_in.innerHTML = i_rad;
+                i_rad_in.innerHTML = i_descript;
             })
             document.querySelectorAll('.o_rad_info').forEach(o_rad_in =>{
-                o_rad_in.innerHTML = o_rad;
+                o_rad_in.innerHTML = o_descript;
             })
 
-            // update the link to inat explore
-            var a = document.getElementById('link_to_inat');
-            a.href = 'https://www.inaturalist.org/observations?place_id=any&subview=map&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + extra_params;
+            // // update the link to inat explore
+            //var a = document.getElementById('link_to_inat');
+            //a.href = 'https://www.inaturalist.org/observations?place_id=any&subview=map&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + extra_params;
 
-            // make the mini map, add tiles etc.
-            let map = L.map('map').setView([lat, lng], 13);
+            // // make the mini map, add tiles etc.
+            let map = L.map('map').setView([map_lat, map_lng], 13);
             map.options.maxZoom = 16;
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 16,
                 attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
             }).addTo(map);
 
-            // add the donut
-            let donut = L.donut([lat, lng], {
-                radius: o_rad * 1000,
-                innerRadius: i_rad * 1000,
-                innerRadiusAsPercent: false,
-            }).addTo(map);
+            // add the approppriate shapes donut
+            if(i_shape=="circle" & o_shape=="circle"){
+                let donut = L.donut([map_lat, map_lng], {
+                    radius: params_o_full[params_o_full_names.indexOf("radius")].split("=")[1] * 1000,
+                    innerRadius: params_i_full[params_i_full_names.indexOf("radius")].split("=")[1] * 1000,
+                    innerRadiusAsPercent: false,
+                }).addTo(map);
+            } else {
+                if (i_shape=="circle"){
+                    L.circle([map_lat, map_lng], {
+                        radius: params_i_full[params_i_full_names.indexOf("radius")].split("=")[1] * 1000
+                    }).addTo(map);
+                }
+                if (o_shape=="circle"){
+                    L.circle([params_o_full[params_o_full_names.indexOf("lat")].split("=")[1], params_o_full[params_o_full_names.indexOf("lng")].split("=")[1]], {
+                        radius: params_o_full[params_o_full_names.indexOf("radius")].split("=")[1] * 1000
+                    }).addTo(map);
+                }
+                if (i_shape = "poly"){
+                    L.geoJSON(place_i_geojson).addTo(map);
+                }
+                if (o_shape = "poly"){
+                    L.geoJSON(place_o_geojson).addTo(map);
+                }
+            }
 
-            // add the ghost donut and make it stay in the centre of the map
-            let donut2 = L.donut([lat, lng], {
+            // // add the ghost donut and make it stay in the centre of the map
+            let donut2 = L.donut([map_lat, map_lng], {
                 radius: document.getElementById("o_rad").value * 1000,
                 innerRadius: document.getElementById("i_rad").value * 1000,
                 innerRadiusAsPercent: false,
@@ -392,7 +527,7 @@
                 donut2.setLatLng(map.getCenter());
             });
 
-            // update the radii of the ghost donut based on inputs
+            // // update the radii of the ghost donut based on inputs
             document.getElementById('i_rad').onchange = function() {
                 donut2.setInnerRadius(document.getElementById("i_rad").value * 1000);
             };
@@ -400,61 +535,61 @@
                 donut2.setRadius(document.getElementById("o_rad").value * 1000);
             };
             
-            // add the central marker
+            // // add the central marker
             var myIcon = L.icon({
                 iconUrl: 'images/location-pin.png',
                 iconSize: [24, 24],
                 iconAnchor: [12, 24],
             });
-            L.marker([lat, lng], {icon: myIcon}).addTo(map);
+            L.marker([map_lat, map_lng], {icon: myIcon}).addTo(map);           
 
-            //add the place if needed
-            if(use_place_shape){
-                
-                L.geoJSON(place_geojson).addTo(map);
-
-
-            };
-            
-
-            // update the lat long inputs when the map moves
+            // // update the lat long inputs when the map moves
             map.addEventListener('move', function(ev) {
                 latlng = map.getCenter();
                 document.getElementById('lat').value = latlng.lat;
                 document.getElementById('lng').value = latlng.lng;
             });
 
+
+
+
+
+            
+
+
+
+
             // main function for rendering data
             async function renderData() {
+
+ 
+
+                var params_i_string = "?"+params_i_full.join("&");
+                var params_o_string = "?"+params_o_full.join("&");
+
+                console.log(params_i_string);
+                console.log(params_o_string);
                 
 
                 bar.style.width = "20%";
                 bar.innerHTML = "Getting summary";
                 // get the number of records for the region and the locality
-                let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0");
+                let species_count = await getData('https://api.inaturalist.org/v1/observations/species_counts'+params_o_string+"&per_page=0");
                 
-                if(use_place_shape){
-                    var species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url +  "&per_page=0");
-                } else {
-                    var species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0");
-                };
-
+                var species_count_local = await getData('https://api.inaturalist.org/v1/observations/species_counts'+params_i_string+"&per_page=0");
                 
 
                 let today = new Date();
                 let priorDate = new Date(new Date().setDate(today.getDate() - 30)).toISOString().split('T')[0];
                 console.log(priorDate);
-                let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&per_page=0" + "&d2=" + priorDate);
+                let species_count_old = await getData('https://api.inaturalist.org/v1/observations/species_counts'+ params_o_string + "&per_page=0" + "&d2=" + priorDate);
                 
-                if(use_place_shape){
-                    var species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url +  "&per_page=0"+ "&d2=" + priorDate);
-                } else {
-                    var species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + "&per_page=0" + "&d2=" + priorDate);
-                };
+                var species_count_local_old = await getData('https://api.inaturalist.org/v1/observations/species_counts' + params_i_string +  "&per_page=0"+ "&d2=" + priorDate);
+
                 //console.log(species_count_old);
 
                 // Get the contributors
-                let contributors = await getData('https://api.inaturalist.org/v1/observations/observers?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad);
+                let contributors = await getData('https://api.inaturalist.org/v1/observations/observers'+params_i_string);
                 //console.log(contributors); 
                 
                 
@@ -493,7 +628,6 @@
                 bar.style.width = "40%";
                 bar.innerHTML = "Getting list of recorded species";
 
-
                 // initialise create an array of species in the area
                 species_local_array = [];
                 species_id_local_array = [];
@@ -507,11 +641,7 @@
                 // add to the array of species in the area, whilst also building the 'species recorded' tab
                 let html_recorded = '';
                 for (let i = 1; i < (max_page + 1); i++) {
-                    if(use_place_shape){
-                        var species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?place_id=' + i_place_id_url + '&page=' + i);
-                    } else {
-                        var species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + i_rad + '&page=' + i);
-                    };
+                    var species_local = await getData('https://api.inaturalist.org/v1/observations/species_counts'+params_i_string);
                     
                     //console.log(species_local);
                     species_local.results.forEach(specie => {
@@ -544,7 +674,7 @@
                 //console.log(species_local_array);
 
                 // Species in the big circle
-                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts?lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&without_taxon_id=" + species_id_local_array.slice(0, 499).join());
+                let species = await getData('https://api.inaturalist.org/v1/observations/species_counts' + params_o_string + "&without_taxon_id=" + species_id_local_array.slice(0, 400).join());
                 console.log(species);
 
                 let html_missing = '';
@@ -596,28 +726,45 @@
 
             // add all records onto map
             //L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=blue&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad, {
-            L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=blue'+extra_params,{
+            L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=blue&'+params_generic_full.join("&"),{
                 maxZoom: 19,
                 opacity: 0.3,
                 attribution: 'iNaturalist'
             }).addTo(map);
-
-            // add user records onto map (this is not implemented yet)
-            //L.tileLayer('https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?verifiable=true&rank=species&color=green&lat=' + lat + '&lng=' + lng + '&radius=' + o_rad + "&user_id=" + user_id, {
-            //   maxZoom: 19,
-            //    opacity: 0.3,
-            //    attribution: 'iNaturalist'
-            //}).addTo(map);
         }
 
 
         // apply settings to take to new page - used as onClick
         function applySettings(reset_gps){
-            if(reset_gps){
-                window.location = "?i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value +extra_params;
-            } else {
-                window.location = '?lat='+document.getElementById("lat").value+"&lng="+document.getElementById("lng").value+"&i_rad="+document.getElementById("i_rad").value+"&o_rad="+document.getElementById("o_rad").value +extra_params;
+
+            var newurl = "?";
+
+            if(params_generic_full.length>0){
+                newurl = newurl.concat(params_generic_full.join("&"))+"&";
             }
+            if(params_i_full_no_spatial.length>0){
+                newurl = newurl.concat(params_i_full_no_spatial.map(i => 'i_' + i).join("&"))+"&";
+            }
+            if(params_o_full_no_spatial.length>0){
+                newurl = newurl.concat(params_o_full_no_spatial.map(i => 'o_' + i).join("&"))+"&";
+            }
+
+
+            if(!reset_gps){
+                newurl = newurl.concat('&i_lat='+document.getElementById("lat").value+"&i_lng="+document.getElementById("lng").value);
+            }
+            
+            // clean up url
+            newurl = newurl.replace("&&","&");
+            newurl = newurl.replace("&&","&");
+            while(newurl.charAt(0) === '&')
+            {
+                newurl = newurl.substring(1);
+            }
+
+            console.log(newurl);
+
+            window.location =newurl;
         }
 
     </script>

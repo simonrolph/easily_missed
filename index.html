@@ -460,7 +460,7 @@
                             var record_plurality = "records";
                         }
                         let htmlSegment = '<div class="card"><div class="card-body">' +
-                            "<em>" + specie.taxon.name + "</em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
+                            "<em><a target='_blank' href='https://www.inaturalist.org/taxa/" + specie.taxon.id + "'>" + specie.taxon.name + "</a></em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
                             +lat + '&lng=' + lng + '&radius=' + o_rad + '&taxon_id=' + specie.taxon.id +
                             ">" +
                             specie.count + " " + record_plurality + "</a>" +
@@ -494,7 +494,7 @@
                         }
 
                         let htmlSegment = '<div class="card"><div class="card-body">' +
-                            "<em>" + specie.taxon.name + "</em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
+                            "<em><a target='_blank' href='https://www.inaturalist.org/taxa/" + specie.taxon.id + "'>" + specie.taxon.name + "</a></em>, " + specie.taxon.preferred_common_name + " - <a target='_blank' href=https://www.inaturalist.org/observations?place_id=any&subview=map&lat=" +
                             +lat + '&lng=' + lng + '&radius=' + o_rad + '&taxon_id=' + specie.taxon.id +
                             ">" +
                             specie.count + " " + record_plurality + "</a>" +
